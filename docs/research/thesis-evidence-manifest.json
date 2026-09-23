@@ -1,0 +1,105 @@
+{
+  "$schema": "./schemas/evidence-manifest.schema.json",
+  "schemaVersion": 1,
+  "projectIdentity": {
+    "name": "Privacy Lens",
+    "branch": "9-8-Finalize",
+    "sourceBaselineSha": "727056c4b29065a4c21ab9bc291c85ca8fa93d5f",
+    "releaseVersion": "1.15.0",
+    "packageName": "com.zhihengzhang.privacylens",
+    "androidVersionCode": 16,
+    "androidMinSdk": 24,
+    "androidTargetSdk": 36
+  },
+  "empiricalEvidence": {
+    "fdroidStaticCorpusN": 495,
+    "fdroidSensitivePermissionN": 125,
+    "fdroidSensitiveAndNetworkN": 74,
+    "fdroidSensitiveAndBackgroundN": 74,
+    "fdroidMultiProcessN": 54,
+    "deviceDistinctPackagesN": 233,
+    "completedEndToEndWorkflowsN": 203,
+    "failedDeviceWorkflowsN": 30,
+    "validPssTelemetryN": 98,
+    "validTimingTelemetryN": 101,
+    "flowdroidReceiptsN": 1,
+    "flowdroidXmlArtifactsN": 0
+  },
+  "evidenceSources": [
+    {
+      "id": "FDROID_STATIC_CENSUS",
+      "path": "testing-report/fdroid-open-store-2026-08-22/dex-manifest-census-verified-final-495.json",
+      "sha256": "31ea1179cd41080f2868bd390bc56968f6c0465c0d8af54f45bd7f9852dded94"
+    },
+    {
+      "id": "DEVICE_BATCH_AGGREGATE",
+      "path": "testing-report/fdroid-open-store-2026-08-22/device-batch-aggregate-final.json",
+      "sha256": "7260fd2b265b74f213c6ab710ba8a5450a5f7543f7188823b53228afd1093916"
+    },
+    {
+      "id": "FLOWDROID_BASELINE_RECEIPT",
+      "path": "testing-report/academic-baseline-2026-08-22/flowdroid-wps-rerun/flowdroid-receipt.json",
+      "sha256": "6bf5e4ef28f988e5455c4a7bb72fcf5a147f4449ac6df515d7f6497b5d549b01"
+    },
+    {
+      "id": "DEVICE_REDACTED_SAMPLES",
+      "path": "experiments/thesis-results/device-metrics-redacted.json",
+      "sha256": "b1ffb0c21c8a248509db6df6d56524ce2c34e76d7fd1994b6de1d2ba4917510c"
+    }
+  ],
+  "formalEvidence": {
+    "propertyIds": [
+      "P1_NO_UNSUPPORTED_VERDICT",
+      "P2_FAIL_CLOSED_ADMISSION",
+      "P3_PROVENANCE_ISOLATION",
+      "P4_REPLAY_IDEMPOTENCE",
+      "P5_ORDER_INVARIANCE",
+      "P6_OVERLAP_NON_AMPLIFICATION",
+      "P7_RESTART_EQUIVALENCE",
+      "P8_PACK_HISTORICAL_BINDING",
+      "P9_MISSING_OUTPUT_PRESERVATION"
+    ],
+    "mutationCases": [
+      "M1_VERDICT_ESCALATION",
+      "M2_UNKNOWN_SOURCE_ACCEPTED",
+      "M3_SYNTHETIC_PROMOTION",
+      "M4_REPLAY_INCREMENT",
+      "M5_ORDER_SENSITIVE",
+      "M6_OVERLAP_SUM",
+      "M7_CROSS_PACK_RESTORE",
+      "M8_HISTORY_REWRITE",
+      "M9_MISSING_AS_NEGATIVE"
+    ],
+    "mutationScore": 1,
+    "stressReceipt": "testing-report/final-thesis-evidence-2026-08-21.md"
+  },
+  "stressCampaign": {
+    "driver": "tests/runTemporalStressCampaign.ts",
+    "determinismCheck": "scripts/verify-stress-determinism.js",
+    "seed": "0x5eed2026",
+    "corpusRounds": 40000,
+    "restartCases": 10000,
+    "malformedCases": 20000,
+    "boundedSnapshotEntries": 10001,
+    "assertions": 112236,
+    "elapsedMsObservedOnBaselineHost": 9513,
+    "ruleMatches": {
+      "CROSS_DOMAIN_PROFILING": 1354,
+      "HIGH_FREQUENCY_LOCATION": 1300,
+      "MULTIMODAL_BIOMETRIC_CAPTURE": 1407,
+      "POST_BACKGROUND_MEDIA_ACCESS": 1397,
+      "RESEARCH_SENSOR_FUSION": 15194,
+      "WEARABLE_LOCATION_HEALTH": 1594
+    },
+    "caveat": "Deterministic logical campaign over generated inputs. The assertion total and per-rule match counts are reproduced byte-for-byte on any host; the recorded elapsed time is a single host observation and is not a benchmark."
+  },
+  "independentReview": {
+    "status": "NOT_RUN",
+    "reviewedItemsN": null,
+    "reviewersN": null,
+    "rawAgreement": null,
+    "cohensKappa": null,
+    "unresolvedCriticalDisagreements": null
+  },
+  "claimBoundary": "Counts describe a hash-pinned, purposively selected open-source corpus and bounded device/tool executions. They are not Android-population prevalence, commercial-app evidence, legal ground truth, GDPR compliance, or cross-device reliability."
+}

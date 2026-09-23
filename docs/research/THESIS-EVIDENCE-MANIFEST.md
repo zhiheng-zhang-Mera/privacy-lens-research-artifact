@@ -1,0 +1,9 @@
+# Thesis Evidence Manifest
+
+The authoritative numeric source is `thesis-evidence-manifest.json`. `scripts/verify-thesis-evidence.js` checks its release identity, receipt hashes, receipt-derived denominators, and generated LaTeX macros. Run it with `--write` only when intentionally regenerating `Thesis/Final/generated-results.tex`; ordinary verification is read-only and fails when that file is stale.
+
+The frozen research baseline is branch `8-22` at commit `727056c4b29065a4c21ab9bc291c85ca8fa93d5f`; the mature candidate was `8-24` at `225b03476dd863ee79caf56d96f84d52a379daa5`, and the finalization branch is `9-8-Finalize`. Release identity is version `1.15.0`, Android version code `16`, package `com.zhihengzhang.privacylens`, min SDK `24`, and target SDK `36`.
+
+The manifest records only observed results that can be traced to committed receipts. Independent legal mapping review remains `NOT_RUN` and its fields remain `null` until that workstream produces evidence. The curated mutation outcome, by contrast, is no longer `null`: `npm run verify:mutation` applies each of the nine registered source weakenings to an isolated copy of the sources, recompiles, and requires the compiled suite to detect it, and `formalEvidence.mutationScore` records the resulting `9/9`. The `stressCampaign` block pins the deterministic totals of `tests/runTemporalStressCampaign.ts`. A completed FlowDroid invocation without an XML result remains an observed missing artifact, never a zero-flow result.
+
+These counts support reproducible engineering statements about a hash-pinned, purposively selected open-source corpus and bounded device/tool executions. They do not support population prevalence, commercial-app coverage, legal ground truth, GDPR compliance, human comprehension, or cross-device reliability.

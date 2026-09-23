@@ -1,0 +1,20 @@
+{
+  "$schema": "./schemas/release-identity.schema.json",
+  "schemaVersion": 1,
+  "project": "Privacy Lens",
+  "repository": "privacy-lens-research-artifact",
+  "branch": "main",
+  "sourceBaseline": {
+    "branch": "8-22",
+    "gitCommitSha": "727056c4b29065a4c21ab9bc291c85ca8fa93d5f"
+  },
+  "releaseVersion": "1.15.0",
+  "android": {
+    "packageName": "com.zhihengzhang.privacylens",
+    "versionCode": 16,
+    "minSdk": 24,
+    "targetSdk": 36
+  },
+  "status": "RESEARCH_PROTOTYPE",
+  "claimBoundary": "The frozen source baseline identifies the historical revision this artifact was distilled from; it is not a revision of this repository. This identity is not a legal-compliance, production-readiness, or cross-device-validity claim."
+}

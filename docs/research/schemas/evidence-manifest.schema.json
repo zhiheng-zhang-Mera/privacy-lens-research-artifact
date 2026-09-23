@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/privacy-lens/evidence-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectIdentity", "empiricalEvidence", "evidenceSources", "formalEvidence", "stressCampaign", "independentReview", "claimBoundary"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "projectIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "branch", "sourceBaselineSha", "releaseVersion", "packageName", "androidVersionCode", "androidMinSdk", "androidTargetSdk"],
+      "properties": {
+        "name": { "const": "Privacy Lens" },
+        "branch": { "const": "9-8-Finalize" },
+        "sourceBaselineSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "releaseVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "packageName": { "type": "string", "minLength": 1 },
+        "androidVersionCode": { "type": "integer", "minimum": 1 },
+        "androidMinSdk": { "type": "integer", "minimum": 1 },
+        "androidTargetSdk": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "empiricalEvidence": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "evidenceSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "sha256"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "formalEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["propertyIds", "mutationCases", "mutationScore", "stressReceipt"],
+      "properties": {
+        "propertyIds": { "type": "array", "items": { "type": "string" } },
+        "mutationCases": { "type": "array", "items": { "type": "string" } },
+        "mutationScore": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "stressReceipt": { "type": "string", "minLength": 1 }
+      }
+    },
+    "stressCampaign": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["driver", "determinismCheck", "seed", "corpusRounds", "restartCases", "malformedCases", "boundedSnapshotEntries", "assertions", "elapsedMsObservedOnBaselineHost", "ruleMatches", "caveat"],
+      "properties": {
+        "driver": { "type": "string", "minLength": 1 },
+        "determinismCheck": { "type": "string", "minLength": 1 },
+        "seed": { "type": "string", "minLength": 1 },
+        "corpusRounds": { "type": "integer", "minimum": 1 },
+        "restartCases": { "type": "integer", "minimum": 1 },
+        "malformedCases": { "type": "integer", "minimum": 1 },
+        "boundedSnapshotEntries": { "type": "integer", "minimum": 1 },
+        "assertions": { "type": "integer", "minimum": 1 },
+        "elapsedMsObservedOnBaselineHost": { "type": "integer", "minimum": 1 },
+        "ruleMatches": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "integer", "minimum": 1 }
+        },
+        "caveat": { "type": "string", "minLength": 1 }
+      }
+    },
+    "independentReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewedItemsN", "reviewersN", "rawAgreement", "cohensKappa", "unresolvedCriticalDisagreements"],
+      "properties": {
+        "status": { "enum": ["NOT_RUN", "RUNNING", "COMPLETE"] },
+        "reviewedItemsN": { "type": ["integer", "null"], "minimum": 0 },
+        "reviewersN": { "type": ["integer", "null"], "minimum": 0 },
+        "rawAgreement": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "cohensKappa": { "type": ["number", "null"], "minimum": -1, "maximum": 1 },
+        "unresolvedCriticalDisagreements": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "claimBoundary": { "type": "string", "minLength": 1 }
+  }
+}
