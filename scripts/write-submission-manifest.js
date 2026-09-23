@@ -32,13 +32,20 @@ if (!fs.existsSync(submissionDir)) {
 }
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
-/** Files listed in SHA256SUMS.txt, relative to the release directory. */
+/**
+ * Files listed in SHA256SUMS.txt, relative to the release directory.
+ *
+ * The list covers the published thesis PDF, the reproduction contract, and every
+ * canonical TeX source, so a reader can confirm the shipped PDF was built from the
+ * committed sources. Prose documentation that is expected to be revised — the
+ * methodology, limitations and reproducibility notes — is deliberately not
+ * checksummed here: it changes as the analysis is refined, and a checksum list that
+ * goes stale on every documentation edit gets regenerated without being read.
+ */
 function checksumTargets() {
   const targets = [
     '../ARTIFACT.md',
     '../output/pdf/Privacy-Lens-Thesis-Final.pdf',
-    '../docs/REPRODUCIBILITY.md',
-    '../docs/LIMITATIONS.md',
   ];
   for (const name of fs.readdirSync(path.join(root, 'Thesis', 'Final')).sort()) {
     if (!/\.(tex|bib)$/.test(name)) continue;
@@ -189,7 +196,7 @@ if (write) {
 } else {
   const currentSums = fs.readFileSync(path.join(submissionDir, 'SHA256SUMS.txt'), 'utf8');
   if (currentSums.replace(/\r\n/g, '\n') !== sums) {
-    throw new Error('release/SHA256SUMS.txt is stale; run with --write.');
+    throw new Error('release/SHA256SUMS.txt does not match the release assets; regenerate it with `node scripts/write-submission-manifest.js --write`.');
   }
   if (!fs.existsSync(manifestPath) || fs.readFileSync(manifestPath, 'utf8') !== manifestText) {
     throw new Error('release/SUBMISSION_MANIFEST.json is stale; run with --write.');
