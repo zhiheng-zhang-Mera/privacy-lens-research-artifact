@@ -15,7 +15,7 @@ default `core.autocrlf=true`.
 
 | Check | Result | Evidence |
 |---|---|---|
-| Repository created | PASS | 11 commits on `main`, new root history, no inherited ancestry; HEAD `84fb664` |
+| Repository created | PASS | New root history on `main` with no inherited ancestry; `git log` shows construction stages only. The revision under test is whatever this file is committed in. |
 | Old repository untouched | PASS | Read-only Git commands only; the historical repository was never written to, and HEAD/tag/branches were verified unchanged |
 | Canonical source identified | PASS | `10c6481d` — a strict descendant of the tagged commit, 13 commits ahead and 0 behind; see `docs/DEVELOPMENT_EVOLUTION.md` |
 | Secrets removed | PASS | No credential-shaped tracked file; no token pattern matched; the only hits were base64 lock-file integrity strings, which are not credentials |
