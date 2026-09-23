@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": ".compliance-test-build",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/compliance/IComplianceEngine.ts",
+    "src/compliance/types.ts",
+    "src/compliance/GDPRComplianceEngine.ts",
+    "src/compliance/RulePackComplianceEngine.ts",
+    "src/regulations/**/*.ts",
+    "src/compliance/ViolationSimulator.ts",
+    "src/compliance/Evaluation.ts",
+    "src/compliance/DashboardModel.ts",
+    "src/compliance/DecisionReadiness.ts",
+    "src/compliance/TemporalCooccurrenceEngine.ts",
+    "src/compliance/ControlledTemporalFixture.ts",
+    "src/compliance/temporalLedgerLimits.ts",
+    "tests/pinned-evaluation-date.ts",
+    "tests/runComplianceTests.ts",
+    "tests/runExtendedComplianceTests.ts",
+    "tests/runGovernanceAndPropertyTests.ts",
+    "tests/runTemporalCooccurrenceTests.ts",
+    "tests/runTemporalStressCampaign.ts",
+    "tests/runInformationFlowPolicyTests.ts"
+  ]
+}

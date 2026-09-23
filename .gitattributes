@@ -1,0 +1,42 @@
+# Line-ending and byte-identity policy for the reproducible artifact.
+#
+# `docs/research/thesis-evidence-manifest.json` pins evidence receipts by raw
+# SHA-256 over their committed bytes, and `scripts/verify-thesis-evidence.js`
+# recomputes each digest from the working tree. Those digests only match when the
+# checkout bytes equal the committed blob bytes.
+#
+# Git's `core.autocrlf=true` — the default written by the Git for Windows
+# installer, and the configuration present in the reference development
+# environment — rewrites LF to CRLF in the working tree. That changed the bytes
+# and made `npm run reproduce:thesis-core` fail on Windows while passing on Linux
+# CI. Declaring the policy inside the repository removes the dependence on the
+# reproducer's local Git configuration.
+#
+# `text eol=lf` is what makes the checkout reproducible: `eol=lf` is enforced at
+# checkout time and overrides `core.autocrlf`. A plain `-text` marker only
+# disables normalisation and still leaves `core.autocrlf=true` free to convert
+# the working tree, which is the failure this file exists to prevent.
+#
+# Text files are therefore stored and materialised with LF on every platform, so
+# all operating systems get identical bytes.
+* text eol=lf
+
+# Binary assets keep their exact committed bytes. These markers are redundant for
+# most of the listed types (Git already treats them as binary) but they state the
+# intent explicitly and protect any file whose type detection is ambiguous.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.jar  binary
+*.apk  binary
+*.aab  binary
+*.zip  binary
+*.so   binary
+*.ttf  binary
+*.otf  binary
+*.keystore binary
+*.jks  binary

@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Privacy Lens",
+    "slug": "privacy-lens",
+    "version": "1.15.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/privacy-lens-icon.png",
+    "scheme": "privacylens",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#DDF2EA",
+        "foregroundImage": "./assets/images/privacy-lens-foreground.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.zhihengzhang.privacylens"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/privacy-lens-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#F3F6F4",
+          "dark": {
+            "backgroundColor": "#F3F6F4"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

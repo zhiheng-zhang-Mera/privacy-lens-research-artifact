@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this research artifact, please cite it using the metadata below."
+title: "Privacy Lens: evidence-bounded permission-activity review for Android privacy assessment"
+abstract: >-
+  Privacy Lens is an offline, evidence-first Android research prototype that turns
+  heterogeneous permission and activity evidence into review prompts while
+  refusing to convert admission state into a legal conclusion. This repository is
+  the reproducible publication artifact for the accompanying thesis; it contains
+  the implementation, the verification pipeline, the canonical experiment
+  configuration, the pinned evidence receipts, and the LaTeX thesis source.
+type: software
+authors:
+  - family-names: "Zhang"
+    given-names: "Zhiheng"
+repository-code: "https://github.com/zhiheng-zhang-Mera/privacy-lens-research-artifact"
+license: LicenseRef-AllRightsReserved
+keywords:
+  - Android
+  - privacy
+  - GDPR
+  - reproducible research
+  - static analysis
+  - evidence traceability
+# Unreleased metadata. These fields are intentionally omitted rather than guessed:
+#   doi:            no archival DOI has been minted for this artifact
+#   version:        the version below tracks the prototype release, not a publication
+#   date-released:  no public release date has been set
+version: "1.15.0"
+notes: >-
+  The thesis document that this artifact accompanies is included as LaTeX source
+  under Thesis/Final and as a compiled PDF under output/pdf. Publication status,
+  venue, and DOI are unresolved and are not asserted here.
