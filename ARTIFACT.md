@@ -58,7 +58,7 @@ committed receipts are verified as records; their execution is not re-run.
 |---|---|
 | Node.js | 20.x in CI; package contract `>=20 <25` |
 | npm | lock file version 3 (`packageManager` records `npm@10.8.2`) |
-| Java | 17 (required only for the Android host-JVM unit tests) |
+| Java | 17 — required only for the Android host-JVM unit tests. Gradle 8.14.3 does not run on Java 26. |
 | Gradle wrapper | 8.14.3 |
 | Android SDK | compile/target 36; minimum SDK 24 |
 | React Native / Expo | 0.81.5 / 54.0.33 family, resolved by the npm lock |

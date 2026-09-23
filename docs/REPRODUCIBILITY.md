@@ -24,7 +24,7 @@ npm run reproduce:thesis-stress
 |---|---|---|
 | Node.js | 20–24 | `engines` contract `>=20 <25`; CI uses 20 |
 | npm | lock file version 3 | `packageManager` records `npm@10.8.2` |
-| Java | 17 | only for `npm run test:android-unit` |
+| Java | 17 | only for `npm run test:android-unit`. Gradle 8.14.3 refuses to start on Java 26, and `JAVA_HOME` must point at the JDK |
 | Android SDK | platform 36, build-tools 36 | only for the Android build and its unit tests |
 | TeX distribution | TeX Live 2026 or equivalent | only for `npm run reproduce:thesis-pdf` |
 
