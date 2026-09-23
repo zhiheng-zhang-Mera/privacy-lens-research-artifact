@@ -1,0 +1,143 @@
+#!/usr/bin/env node
+/* Authorised, fail-closed install -> inspect -> stop -> uninstall experiment. */
+const { createHash } = require('crypto');
+const { execFileSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const root = path.resolve(__dirname, '..');
+const args = process.argv.slice(2);
+const arg = (flag) => { const i = args.indexOf(flag); return i < 0 ? undefined : args[i + 1]; };
+const catalogPath = arg('--catalog');
+const serial = arg('--serial');
+const execute = args.includes('--execute') && args.includes('--allow-device-installs');
+const maxSuccessesArg = arg('--max-successes');
+const maxSuccesses = maxSuccessesArg === undefined ? Infinity : Number(maxSuccessesArg);
+const installTimeoutMs = Number(arg('--install-timeout-ms') || 120_000);
+const outputDir = arg('--output-dir') || path.join(root, 'commercial-app-batch', `store-corpus-${new Date().toISOString().replace(/[:.]/g, '-')}`);
+const oemInstaller = path.join(root, 'scripts', 'install-authorized-apk-with-oem-confirmation.js');
+if (!catalogPath || !serial || !(maxSuccesses === Infinity || (Number.isInteger(maxSuccesses) && maxSuccesses > 0)) || !Number.isInteger(installTimeoutMs) || installTimeoutMs < 30_000 || installTimeoutMs > 120_000) throw new Error('Usage: node scripts/run-store-corpus-batch.js --catalog <100-to-500-app.json> --serial <adb-serial> [--execute --allow-device-installs] [--install-timeout-ms 30000..120000] [--max-successes positive-integer] [--output-dir <dir>]');
+const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+const sha256 = (file) => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const settle = (milliseconds) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+function validateCatalog(value) {
+  if (value?.schema !== 'privacy-lens.android-store-corpus.v1' || !Array.isArray(value.apps) || value.apps.length < 100 || value.apps.length > 500) throw new Error('Corpus must declare 100 to 500 apps with the v1 schema.');
+  const benchmark = value.corpusKind === 'ACADEMIC_BENCHMARK';
+  const openSourceStore = value.corpusKind === 'OPEN_SOURCE_APP_STORE';
+  if (value.corpusKind !== undefined && value.corpusKind !== 'APP_STORE_COMMERCIAL' && !benchmark && !openSourceStore) throw new Error('Corpus kind must be APP_STORE_COMMERCIAL, OPEN_SOURCE_APP_STORE, or ACADEMIC_BENCHMARK.');
+  const ids = new Set(); const packages = new Set();
+  for (const app of value.apps) {
+    if (!app?.id || !app.displayName || !/^[A-Za-z0-9_.-]+$/.test(app.packageName || '') || !/^https:\/\//.test(app.storeUrl || '') || !Array.isArray(app.apkFiles) || !app.apkFiles.length) throw new Error(`Invalid corpus entry: ${app?.id ?? 'unknown'}`);
+    if (ids.has(app.id) || (!benchmark && packages.has(app.packageName))) throw new Error(`Duplicate corpus identity: ${app.id}/${app.packageName}`);
+    ids.add(app.id); packages.add(app.packageName);
+    for (const file of app.apkFiles) {
+      if (!fs.existsSync(file.path) || !/^[a-f0-9]{64}$/i.test(file.sha256) || sha256(file.path).toLowerCase() !== file.sha256.toLowerCase()) throw new Error(`Unverified APK input for ${app.packageName}`);
+    }
+  }
+}
+function adb(command, commandArgs = []) {
+  try {
+    return execFileSync('adb', ['-s', serial, ...command, ...commandArgs], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000 }).trim();
+  } catch (error) {
+    if (error?.signal === 'SIGTERM' || error?.code === 'ETIMEDOUT') throw new Error(`ADB command timed out after 60 seconds: ${command.join(' ')}`);
+    throw error;
+  }
+}
+function isInstalled(packageName) {
+  // `pm path` returns exit status 1 for an absent package on this Android
+  // release, which must not be conflated with a transport failure. `list
+  // packages` returns successfully for both cases and preserves fail-closed
+  // behaviour for genuine ADB errors.
+  return adb(['shell', 'pm', 'list', 'packages', '--user', '0', packageName])
+    .split(/\r?\n/).some((line) => line.trim() === `package:${packageName}`);
+}
+function snapshot(packageName) {
+  // A freshly installed APK often has no process until its launch activity is
+  // started. Treat this as a valid zero-process snapshot, not an ADB failure.
+  const pids = adb(['shell', 'sh', '-c', `pidof ${packageName} || true`]).split(/\s+/).filter(Boolean);
+  // The package-scoped fallback still yields a useful PSS observation for an
+  // app whose launcher quickly hands work to another process.
+  const mem = pids.length ? adb(['shell', 'dumpsys', 'meminfo', pids[0]]) : adb(['shell', 'dumpsys', 'meminfo', packageName]);
+  const pssMatch = mem.match(/TOTAL\s+PSS:\s*([\d,]+)/i);
+  const pss = pssMatch ? Number(pssMatch[1].replace(/,/g, '')) : undefined;
+  return { processCount: pids.length, memoryPssKb: pss };
+}
+function observedRuntimePermissionPrompt(packageName, displayName) {
+  try {
+    const xml = adb(['exec-out', 'uiautomator', 'dump', '/dev/tty']);
+    const packageMatch = xml.includes('package="com.oplus.notificationmanager"') && (xml.includes(packageName) || xml.includes(displayName));
+    if (!packageMatch) return { state: 'NOT_OBSERVED', dismissed: false };
+    // A runtime-permission page from the just-launched package can remain
+    // foregrounded after force-stop and block the next installer page.  Only
+    // dismiss the exact notification-manager denial control; never grant a
+    // permission, never touch a different package's dialog, and retain the
+    // observation as not granted.
+    const nodes = xml.match(/<node\b[^>]*>/g) ?? [];
+    const attributes = (node) => Object.fromEntries([...node.matchAll(/([\w:-]+)="([^"]*)"/g)].map((match) => [match[1], match[2]]));
+    const deny = nodes.map(attributes).find((node) => node['resource-id'] === 'android:id/button2' && ['拒绝', 'Deny', "Don't allow", 'Don’t allow'].includes(node.text) && /^\[\d+,\d+\]\[\d+,\d+\]$/.test(node.bounds || ''));
+    const bounds = deny?.bounds?.match(/^\[(\d+),(\d+)\]\[(\d+),(\d+)\]$/);
+    if (bounds) {
+      const x = Math.round((Number(bounds[1]) + Number(bounds[3])) / 2);
+      const y = Math.round((Number(bounds[2]) + Number(bounds[4])) / 2);
+      adb(['shell', 'input', 'tap', String(x), String(y)]);
+      return { state: 'OBSERVED_NOT_GRANTED', dismissed: true };
+    }
+    return { state: 'OBSERVED_NOT_GRANTED', dismissed: false };
+  } catch { return { state: 'UNAVAILABLE', dismissed: false }; }
+}
+validateCatalog(catalog);
+fs.mkdirSync(outputDir, { recursive: true });
+const report = { schema: 'privacy-lens.android-store-corpus-run.v1', corpusId: catalog.corpusId, corpusKind: catalog.corpusKind ?? 'APP_STORE_COMMERCIAL', generatedAt: new Date().toISOString(), execution: execute ? 'AUTHORISED_DEVICE_RUN' : 'VALIDATION_ONLY', plannedApps: catalog.apps.length, maxSuccesses: Number.isFinite(maxSuccesses) ? maxSuccesses : null, results: [], failures: [] };
+for (const app of catalog.apps) {
+  const item = { id: app.id, displayName: app.displayName, packageName: app.packageName, storeUrl: app.storeUrl, apkSha256: app.apkFiles.map((file) => file.sha256), installAttempted: false, installedByRunner: false, cleanup: 'NOT_STARTED' };
+  const sampleStartedAt = process.hrtime.bigint();
+  try {
+    if (!execute) { item.cleanup = 'NOT_EXECUTED'; report.results.push(item); continue; }
+    if (isInstalled(app.packageName)) { item.preExistingPackage = true; throw new Error('Refusing to replace or uninstall a pre-existing package.'); }
+    item.installAttempted = true;
+    const installerOutput = execFileSync(process.execPath, [oemInstaller, '--serial', serial, '--timeout-ms', String(installTimeoutMs), '--apk', ...app.apkFiles.map((file) => file.path)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: installTimeoutMs + 15_000 });
+    item.installer = JSON.parse(installerOutput);
+    item.installedByRunner = true;
+    item.afterInstall = snapshot(app.packageName);
+    const activity = adb(['shell', 'cmd', 'package', 'resolve-activity', '--brief', app.packageName]).split(/\r?\n/).at(-1);
+    if (!activity || !activity.includes('/')) throw new Error('No launchable activity was resolved.');
+    adb(['shell', 'am', 'start', '-n', activity]);
+    // `am start` returns before many app processes have been spawned. A small,
+    // fixed settle period avoids treating that normal race as zero memory.
+    settle(1_000);
+    item.afterLaunch = snapshot(app.packageName);
+    const runtimePermission = observedRuntimePermissionPrompt(app.packageName, app.displayName);
+    item.runtimePermissionPrompt = runtimePermission.state;
+    item.runtimePermissionPromptDismissed = runtimePermission.dismissed;
+    const permissions = adb(['shell', 'dumpsys', 'package', app.packageName]);
+    item.packageDumpSha256 = createHash('sha256').update(permissions).digest('hex');
+    item.cleanup = 'PENDING';
+    adb(['shell', 'am', 'force-stop', app.packageName]);
+    adb(['uninstall', app.packageName]);
+    if (isInstalled(app.packageName)) throw new Error('Uninstall verification failed.');
+    item.cleanup = 'VERIFIED_REMOVED';
+    item.wallClockElapsedMs = Number(process.hrtime.bigint() - sampleStartedAt) / 1e6;
+    report.results.push(item);
+    if (report.results.length >= maxSuccesses) {
+      report.stopReason = 'MAX_SUCCESSES_REACHED';
+      fs.writeFileSync(path.join(outputDir, 'results.partial.json'), `${JSON.stringify(report, null, 2)}\n`);
+      break;
+    }
+  } catch (error) {
+    // A timed-out installer may still complete after its caller exits. The
+    // package was confirmed absent before this attempt, so a present package
+    // here is attributable to this runner and must be cleaned up as well.
+    let runnerPackagePresent = item.installedByRunner;
+    if (item.installAttempted && !runnerPackagePresent && execute) {
+      try { runnerPackagePresent = isInstalled(app.packageName); } catch { /* retain the original failure */ }
+    }
+    if (runnerPackagePresent) {
+      try { adb(['shell', 'am', 'force-stop', app.packageName]); adb(['uninstall', app.packageName]); item.cleanup = isInstalled(app.packageName) ? 'REMOVAL_FAILED' : 'REMOVED_AFTER_FAILURE'; } catch { item.cleanup = 'REMOVAL_FAILED'; }
+    }
+    item.wallClockElapsedMs = Number(process.hrtime.bigint() - sampleStartedAt) / 1e6;
+    report.failures.push({ ...item, error: error instanceof Error ? error.message : String(error) });
+  }
+  fs.writeFileSync(path.join(outputDir, 'results.partial.json'), `${JSON.stringify(report, null, 2)}\n`);
+}
+fs.writeFileSync(path.join(outputDir, 'results.json'), `${JSON.stringify(report, null, 2)}\n`);
+console.log(`Corpus run finished: ${report.results.length} records, ${report.failures.length} failures, execute=${execute}.`);
+if (report.failures.length) process.exitCode = 2;
