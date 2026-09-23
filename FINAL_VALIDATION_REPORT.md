@@ -15,7 +15,7 @@ default `core.autocrlf=true`.
 
 | Check | Result | Evidence |
 |---|---|---|
-| Repository created | PASS | 9 commits on `main`, new root history, no inherited ancestry |
+| Repository created | PASS | 11 commits on `main`, new root history, no inherited ancestry; HEAD `84fb664` |
 | Old repository untouched | PASS | Read-only Git commands only; the historical repository was never written to, and HEAD/tag/branches were verified unchanged |
 | Canonical source identified | PASS | `10c6481d` — a strict descendant of the tagged commit, 13 commits ahead and 0 behind; see `docs/DEVELOPMENT_EVOLUTION.md` |
 | Secrets removed | PASS | No credential-shaped tracked file; no token pattern matched; the only hits were base64 lock-file integrity strings, which are not credentials |
@@ -35,8 +35,8 @@ default `core.autocrlf=true`.
 | Contributor attribution omitted | PASS | No author, committer or identity field in any documentation; verified by whole-tree scan |
 | Tool/AI contamination absent | PASS | No development-tool reference in any migrated file or document; the disclosure draft and its cross-references were removed |
 | Documentation audit | PASS | No TODO/FIXME, no casual notes, no machine paths, no unsupported numbers; publication metadata recorded as unresolved rather than invented |
-| Fresh clone qualification | PASS | Clean clone at `c7d5f8a` with `core.autocrlf=true`: `npm ci`, `reproduce:thesis-core` and `verify` all exit 0, tree clean |
-| Working tree clean | PASS | `git status` clean before and after every verification run |
+| Fresh clone qualification | PASS | Clean clone with `core.autocrlf=true`: `npm ci`, `reproduce:thesis-core` and `verify` all exit 0, tree clean |
+| Working tree clean | PASS | `git status` clean before and after every verification run; `npm run verify` exit 0 against the committed revision |
 | Release candidate ready | PASS | Local annotated tag candidate available; publication deferred to owner approval |
 
 ## Detail on the non-trivial checks
