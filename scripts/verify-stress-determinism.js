@@ -14,7 +14,6 @@
  */
 const { execFileSync } = require('child_process');
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
@@ -23,8 +22,13 @@ const argument = (name) => {
   const index = process.argv.indexOf(`--${name}`);
   return index === -1 ? undefined : process.argv[index + 1];
 };
+/**
+ * Receipt directory. A fixed name rather than the host name: these receipts are
+ * local reproduction evidence, and naming them after the machine would record
+ * host identity in files that are easy to attach to a report.
+ */
 const outputDir = path.resolve(
-  argument('output-dir') || path.join(root, 'artifacts', 'reproduction', os.hostname().replace(/[^A-Za-z0-9._-]/g, '_')),
+  argument('output-dir') || path.join(root, 'artifacts', 'reproduction', 'local'),
 );
 
 if (!fs.existsSync(driver)) {
