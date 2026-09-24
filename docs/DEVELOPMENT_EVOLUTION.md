@@ -391,8 +391,10 @@ diffs rather than trusting either the branch name or the tag.
   `android/app/src/test/`, `scripts/verify-mutation-detection.js`,
   `scripts/verify-stress-determinism.js`, `scripts/verify-claim-paths.js`,
   `scripts/lib/android-sdk-paths.js`.
-- Branch relationship: `merge-base(9-8-Finalize, dev/thesis-finalization-alien) = acffee1e`;
-  the branch is 13 ahead and 0 behind.
+- Branch relationship: the merge base of the release branch and the later
+  thesis-finalization branch is `acffee1e`; the later branch is 13 commits ahead and
+  0 behind. The later branch's name carries a development-environment label, so it is
+  described by its relationship and tip revision rather than repeated verbatim.
 
 ---
 
