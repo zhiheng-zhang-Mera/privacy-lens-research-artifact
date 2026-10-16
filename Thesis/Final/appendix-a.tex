@@ -1,0 +1,160 @@
+\appendix
+\chapter{Operational and Reproduction Detail}
+\label{app:ops}
+
+This appendix reproduces the operational, configuration and reproduction detail that supports the evaluated system without carrying the thesis argument. It is placed here so that a reviewer can reconstruct the recorded procedure, and so that the main chapters remain within the required length. Nothing in this appendix adds or strengthens a claim made in the main text, and the evidence boundaries stated there continue to apply unchanged.
+
+\section{Implementation Overview and Module Boundaries}
+
+The application uses Expo and React Native for the interface, TypeScript for the decision and state layers, AsyncStorage for app-private persistence, and Kotlin for the Android bridge and workers. Expo Router supplies route composition, while React Navigation primitives support the custom bottom navigation. AndroidX WorkManager represents deferrable background work. The release build uses the Android Gradle Plugin, Hermes JavaScript engine, and standard Android packaging tasks.
+
+The stack was selected to separate concerns rather than to maximise the number of frameworks. TypeScript provides shared types for evidence, findings, and packs. Kotlin is limited to capabilities that require Android APIs or native scheduling. The interface does not import Kotlin details; it calls a typed service that reports capability and results. The compliance engine does not import React Native, storage, or Android modules. This makes deterministic tests runnable under Node after TypeScript compilation.
+
+At the source-tree level, regulation definitions reside under the regulation directory, generic decision logic under compliance, application state under context, the bridge adapter under services, and reusable presentation components under a privacy-specific component directory. Theme constants are centralised. This organisation replaces earlier duplicate compliance services and prevents a screen from becoming the authoritative home of a rule.
+
+Table~\ref{tab:implementation-witnesses} records concrete implementation witnesses for the architecture in Figure~\ref{fig:system-architecture}. The final column is important: a module name alone is weak evidence unless the reviewer can also identify the failure that the separation prevents.
+
+\begin{table}[H]
+\centering
+\caption{Design invariants and implementation witnesses}
+\label{tab:implementation-witnesses}
+\scriptsize
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.39\textwidth}}
+\toprule
+Invariant & Implementation witness & Failure prevented \\
+\midrule
+Unknown input is not trusted & \texttt{parseAudit} and \texttt{evaluateSafe} in \texttt{\seqsplit{RulePackComplianceEngine.ts}} & Malformed bridge or imported data becoming a reassuring normal finding \\
+Source identity survives evaluation & Audit source field, finding evidence, repository migration, and source chip & Simulator or imported evidence being mistaken for device observation \\
+Regional logic is pack-owned & \texttt{RegulationPack}, closed registry, EU pack, and Research Baseline pack & UI, storage, or Android code silently embedding one jurisdiction's terminology \\
+Historical findings keep decision identity & Pack identifier, regulation label, rule reference, rationale, and immutable stored finding & A later pack selection silently reinterpreting an earlier result \\
+The reviewer does not create a new remote data flow & App-private AsyncStorage, no account, analytics, advertising, or evidence upload, plus disabled backup & A privacy-review tool expanding the exposure it is intended to help examine \\
+Release evidence is reproducible but bounded & Versioned package, environment-based signing inputs, APK/AAB hashes, merged manifest, and installed-package record & Treating a local build success as production signing, console approval, or broad device validity \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Android Bridge and Scheduling}
+
+The Kotlin module reports whether the native privacy inspector is available and exposes bounded audit and demonstration operations to React Native. WorkManager workers are registered for periodic or one-time tasks according to Android's scheduling model. WorkManager is deferrable: the operating system may delay work according to battery, idle state, quotas, and vendor policy. The implementation therefore does not describe a registered interval as proof of exact execution time.
+
+The audit worker reads only evidence available under the application's deployment authority. On the tested ColorOS device, that authority did not expose unrestricted third-party history. The bridge returns capability and available summaries rather than fabricating other-package events. The simulator worker follows a controlled path and marks every generated record as simulator source.
+
+Native package declarations were moved from the anonymous template namespace to the stable Privacy Lens namespace. Activity, application, bridge, package, and worker source files use the same identifier as Gradle and the manifest. This reconciliation matters for release upgrades, signing continuity, deep links, provider authorities, and store identity.
+
+\section{Brand and Accessibility Implementation}
+
+The visual language uses evergreen for trust and stability, teal for actions, mint for supportive surfaces, warm off-white for the application background, and restrained red and blue accents for review and evidence states. Rounded panels group related information without relying on heavy separators. Typography uses strong size contrast between product proposition, section heading, count, label, and explanatory copy.
+
+The application icon combines a shield with a lens aperture. The shield suggests protection while the aperture suggests inspection; neither implies surveillance of a person. Adaptive foreground and monochrome assets support launcher contexts. Splash imagery, application icon, colours, and product name are generated consistently across Android densities.
+
+Accessibility labels are supplied for navigation and important actions. Icons do not carry status alone. Buttons use text and large target areas. Cards maintain text contrast against their surfaces. These implementation facts support an accessibility-oriented design claim, while screen-reader traversal, large-font reflow, and assistive-technology user testing remain future acceptance work.
+
+\section{Release Configuration and Privacy Controls}
+
+The Android build sets minimum SDK 24, compile and target SDK 36, version code 16, and version name \PrivacyLensVersion{}. Release tasks produce an APK for controlled device installation and an AAB for Play delivery. The build reads upload-store path, passwords, and alias from environment variables. If they are absent, a local QA fallback signs with the debug configuration. The build can therefore be tested without placing secrets in source, while its output remains clearly distinguished from a production upload artefact.
+
+The source manifest explicitly removes the \texttt{INTERNET} and \texttt{ACCESS\_NETWORK\_STATE} declarations inherited from transitive dependencies, together with the legacy external-storage read and write permissions, using manifest-merger removal directives. The final merged manifest also contains operational declarations contributed by WorkManager and AndroidX. Android backup and data extraction are disabled for the application. Inspection of the installed release package confirms that no sensitive runtime permission is requested. Where this thesis describes the absence of network declarations, it means that the evaluated build does not declare them and that the merged manifest and installed-package dump agree; it does not follow that the application is therefore free of every security or dependency risk.
+
+Package reduction was part of implementation. Dependencies used only by removed charts, health views, haptics, image helpers, secure storage, web browser wrappers, gestures, SVG rendering, and network-status features were removed when no longer needed. Generated build and cache directories remain ignored. This reduces attack surface and maintenance burden, although transitive dependencies are still reviewed through the lock file and final manifest.
+
+Findings and the active-pack preference remain in app-private local storage. The release contains no account system, advertising SDK, behavioural analytics SDK, remote evidence database, or evidence-upload workflow. Settings exposes a direct clear-findings action, and Android backup is disabled so that ordinary uninstall or data clearing does not silently restore the review history. These choices do not make local data invulnerable, but they reduce the number of actors and data flows introduced by the reviewing application itself.
+
+The repository also contains a bilingual privacy-policy draft, user guide, product audit, and store-readiness checklist. These documents distinguish binary behaviour from owner-controlled deployment steps. A public release still requires a stable HTTPS policy URL, support contact, production upload key, console declarations, and internal-track verification. Keeping these requirements outside the code would be insufficient; keeping them only in the interface would be misleading. They are recorded as release evidence linked to the exact build.
+
+Codebase reconciliation supports the same privacy boundary. Legacy health-dashboard, scoring, experiment, charting, duplicate compliance-service, and unused template components were removed because they neither answered a current research question nor belonged to the reviewed product journey. Their dependencies were removed with them. The resulting application has one decision path, one privacy context, one navigation model, and one current user guide, reducing the risk that an obsolete screen or service contradicts the evaluated architecture.
+
+\section{Protocol and Reproducibility}
+
+The protocol begins from six evaluation questions and assigns a separate acceptance condition to each. Reproducibility controls then ensure that the tests exercise current generated code, fixed temporal values, and explicit boundaries rather than relying on stale output or chance coverage.
+
+\subsection{Evaluation Questions and Acceptance Logic}
+
+The evaluation was organised around six questions. First, does the source compile and satisfy static rules? Second, does the decision engine agree with its specified thresholds and statuses? Third, does it reject malformed or adversarial evidence safely? Fourth, do regulation packs remain independent and traceable? Fifth, can the Android release artefacts be assembled, inspected, installed, and launched? Sixth, does the rendered product communicate the expected hierarchy and evidence boundaries on the available physical device?
+
+Each question has a distinct acceptance condition. Source acceptance requires a clean TypeScript application check and ESLint run. Rule acceptance requires exact expected confusion-matrix values for the fixed corpus and passing boundary assertions. Runtime-boundary acceptance requires every malformed case to return the specified rejection code without an uncaught exception. Pack acceptance requires registry allowlisting, different thresholds where defined, retained pack identity, and a non-legal caveat for the Research Baseline.
+
+Android build acceptance requires both release tasks to complete and the artefacts to exist with recorded hashes. Permission acceptance requires agreement between the merged manifest and installed package, with legacy external-storage permissions absent. Physical acceptance requires successful streamed installation, launcher start, stable primary navigation, captured final states, and no matching fatal error in the bounded log scan. Visual acceptance requires inspection of actual screenshots rather than source code alone.
+
+The protocol deliberately does not set an acceptance condition for GDPR compliance, legal accuracy, population detection accuracy, long-run scheduler reliability, battery consumption, multi-device compatibility, or store approval. Those outcomes require evidence not collected in this campaign.
+
+\subsection{Reproducibility Controls}
+
+The compliance sources are compiled immediately before the generated JavaScript runners execute. This control was introduced because a failed TypeScript command can otherwise leave older generated output in place, producing a misleading green test. The acceptance sequence checks the compiler exit code before invoking Node. Generated compliance output is ignored by Git so it cannot become an accidental source of truth.
+
+The main logical corpus uses a fixed linear-congruential seed. A fixed seed makes a failure reproducible while still exploring varied generated values. The 1,000 rounds preserve an 80/20 design: four of every five cases are expected review signals and one is a control. A fresh engine is created for each main-corpus case so temporal state from one generated subject cannot leak into another.
+
+Boundary cases are not left to random chance. For every supported permission, counts at threshold minus two, minus one, equal, plus one, and plus two are exercised. The assertion encodes the strict boundary: only values above the prompt threshold become active under the daily-total rule. Burst tests similarly check exactly at and exactly above each permission-specific limit.
+
+Time is fixed in extended tests. Windows and timestamp arrays are created relative to a constant epoch value rather than the wall clock. This prevents a test from becoming invalid while it runs and makes future failures comparable. Production validation still compares implausible future times against the current clock, but fixtures choose values far enough in the past to avoid accidental rejection.
+
+\section{Build Reproduction}
+
+The release build initially encountered Windows path and dependency-layout problems. A hoisted local dependency layout allowed native CMake paths to remain within workable bounds. React Native's new architecture was disabled for the release candidate because enabling it in this Windows checkout reproduced path-related native build failures. This is a build-environment decision, not evidence that the legacy architecture is preferable for future releases.
+
+Gradle reported deprecated features that will require attention before Gradle 9 compatibility. It also reported an SDK XML version warning caused by differences between installed Android Studio and command-line components. Neither warning prevented the recorded release build, but both are retained as maintenance debt rather than suppressed.
+
+The release task generated bundles for multiple Android ABIs. The APK was installed on the ARM64 physical device. The AAB was not uploaded to Play Console, processed by Play signing, or delivered through an internal track. Its success establishes local bundle generation only.
+
+Hashes were recorded immediately after the final permission-manifest rebuild. Any source or build-tool change requires rebuilding and computing new hashes. The files are generated artefacts and are not treated as immutable simply because their names remain the same.
+
+\section{Manifest and Installed-Package Reconciliation}
+
+Source-manifest inspection alone was insufficient because dependencies contribute declarations through manifest merging. The initial merged manifest exposed legacy external-storage permissions inherited from transitive Expo components. The evaluated source added explicit merger removals for read and write external storage, rebuilt both artefacts, and inspected the merged result again.
+
+The final merged manifest contained wake-lock, boot-completed, foreground-service, and an application-scoped dynamic-receiver signature permission. Internet, network-state, and external-storage declarations were absent. The installed-package dump and APK inspection reported the same requested set and no dangerous runtime permission grants. This three-level check supports the bounded package claim that the evaluated build requests no sensitive runtime permission.
+
+The package dump also confirmed application identity, version name, version code, minimum SDK, target SDK, primary ABI, install state, and signing version. The release used the QA fallback signing identity because production environment variables were absent. A successful package inspection is therefore not proof of final upload-key configuration.
+
+\section{Store-Candidate Evidence Review}
+
+The project-defined store-candidate gate was assessed across product identity, core journey, disclosure, packaging, privacy posture, accessibility foundations, and operational ownership. Product identity was supported by a consistent name, icon, visual language, and package identifier. Core journey was supported by first-launch overview, findings navigation, detailed rationale, pack selection, demonstration control, and local-data deletion. Disclosure was supported by visible source labels, pack identity, evidence limits, and non-verdict language.
+
+Packaging evidence included release APK and AAB generation, target SDK 36, ABI outputs, final checksums, manifest reconciliation, and installation of the APK. Privacy posture included no sensitive runtime permission in the final package, disabled backup, local-first storage, and a draft privacy policy consistent with the tested build. Accessibility foundations included textual state labels, non-colour cues, labelled controls, target sizing intent, and a simple navigation structure.
+
+The gate was not interpreted as proof that every store prerequisite is complete. Production upload signing was absent. The privacy policy required owner-controlled HTTPS publication. Console declarations, listing assets, support details, content rating, internal-track delivery, and store review remained external. These gaps do not negate the engineering candidate; they determine why it must not be described as a publicly released production version.
+
+The visual adjectives in the project gate were converted into inspectable expert-review criteria. Visual coherence meant consistent hierarchy, spacing, typography, colour restraint, branded identity, and absence of visible broken states in the inspected flows. Claim-boundary coherence meant that evidence provenance and limitations were prominent, destructive controls were explicit, and the product did not present a legal badge. Interaction feasibility meant that the evaluator could understand the purpose, reach findings, inspect reasons, switch the review framework, and control data without encountering a blocking defect. None of these observations measures preference, trust, adoption, or willingness to continue use.
+
+These definitions create a repeatable expert gate, but they do not convert subjective judgement into population evidence. A single evaluator can miss cultural preferences, accessibility barriers, unfamiliar terminology, or long-term fatigue. The appropriate next step is internal-track and participant evaluation using the actual distributed candidate. The expert gate answers whether that investment is justified, not whether the market has accepted the product.
+
+The candidate judgement also depends on the declared product category. A local research and accountability aid can be useful with bounded imported or simulated evidence. A product marketed as universal device surveillance would fail because the acquisition authority is not established. Store copy must preserve the former positioning. Changes to marketing are therefore capable of invalidating readiness even if the binary remains identical.
+
+\section{Evaluation Repeatability and Change Control}
+
+The evidence applies to a specific source revision and generated artefacts. Repeating only the final UI flow after changing engine code would not renew rule evidence. Rebuilding only the APK after changing privacy copy would not renew screenshot evidence. The project therefore treats acceptance as a dependency graph: a change invalidates every downstream artefact that incorporates or presents it.
+
+Engine or pack changes require TypeScript compilation, logical suites, boundary suites, presentation projections, release rebuilds, hashes, and targeted device review. Android manifest or Gradle changes require merged-manifest inspection, package dump reconciliation, rebuilds, installation, and launch. UI changes require lint, package build, hierarchy and screenshot capture, accessibility checks, and renewed expert review. Policy or store-description changes require reconciliation with package behaviour and data flows.
+
+Reproducible scripts reduce omission but do not remove the need to inspect their outputs. A command may exit successfully while testing stale generated code, selecting the wrong device, or reading a prior file. The campaign therefore compiles generated runners immediately before execution, checks package identity after installation, and associates evidence with checksums. Future automation should emit a machine-readable manifest linking commit, tool versions, commands, artefact hashes, device facts, and screenshots.
+
+Environment details also matter. Windows path length and native dependency layout affected release compilation. The chosen workaround and architecture flag belong in the build record because a different environment may produce different outputs. Tool warnings about future Gradle compatibility remain maintenance observations even when the current build passes.
+
+A release tag should be immutable, while packs and policies use explicit version identifiers. If a later investigation finds an error, the project should publish a successor and a correction note rather than rewriting the historical evidence. The final source package preserves its evidence narrative without overwriting the historical archive. Preservation makes it possible to see which claims changed and why.
+
+Repeatability finally includes honest failure recording. Network, dependency, device-coordinate, and build-path failures can be part of the evidence because they expose operational assumptions. Removing them from the narrative would make future reproduction harder. A trustworthy evaluation explains both the final pass and the conditions needed to obtain it.
+
+\section{Decision Records for Future Extension}
+
+Future contributors should document material changes as concise decision records. A record should state the problem, evidence, alternatives, selected option, affected invariants, privacy consequences, pack consequences, migration, rollback, and verification required. This is especially important for changes that appear convenient but alter authority, such as adding remote telemetry, inferring jurisdiction automatically, importing an unreviewed rules file, or expanding Android privileges.
+
+A decision record does not replace code review or legal review. It makes assumptions visible before they become distributed across implementation and copy. It also provides a durable explanation when later maintainers ask why the product refuses a seemingly simple shortcut. In a thesis prototype intended for store progression, this continuity matters because deployment work will occur after the original evaluation snapshot.
+
+The first required record for a new acquisition connector should describe deployment authority and observed coverage. The first record for a new regulation pack should identify responsible reviewers and effective sources. The first record for remote services should include a data-flow and retention analysis. The first record for a new user-facing status should specify evidence semantics and comprehension tests. These prompts keep expansion aligned with the central evidence-bounded principle.
+
+\section{Store Delivery as a Trust Boundary}
+
+Application-store readiness includes more than a successful APK. Google Play uses Android App Bundles for new application delivery, requires current target API levels, and requires developers to complete a Data safety declaration \cite{androidAppBundle,playTargetApiLevel,playDataSafety}. Signing identity, a public privacy-policy URL, support contact, screenshots, listing text, and console review remain owner-controlled steps. A research build can be an initial submission candidate while still being unpublishable until these external obligations are completed.
+
+\section{Reproducibility Boundary}
+
+Source-based semantic, mutation, manifest, summary, and adapter checks can be rerun from the repository. The committed summaries preserve missingness and hashes for external evidence without redistributing restricted APKs. Hardware-dependent receipts cannot be regenerated by CI, and the device evidence applies only to the recorded handset and installed build. Reproduction of the core pipeline therefore checks transformations and receipt integrity, not a fresh \DevicePackagesN{}-package device campaign or an independent legal review.
+
+\section{Physical Interaction Protocol}
+
+The device was identified by ADB before installation. The final release APK was streamed with replacement enabled, the package was force-stopped, and the launcher intent was injected. Package metadata was read after installation so that a stale or differently named package could not be mistaken for the new build.
+
+Interaction evidence included screenshots and UI hierarchy dumps for overview, findings, and settings. A controlled demonstration populated the dashboard and finding list. The final overview was captured again after the permission-manifest rebuild and installation. Runtime review used filtered AndroidRuntime and ReactNativeJS error channels; no matching fatal output appeared in the bounded recent log window.
+
+An important measurement issue arose from coordinate spaces. The physical display reported 1080 by 2400 pixels, while the captured application window and hierarchy used 1080 by 2244. Initial taps derived from the full display therefore appeared to miss navigation targets. A bounded coordinate sweep and hierarchy inspection established the offset, after which navigation succeeded. The event is reported because excluding it would conceal a real threat to ADB-based UI-test validity.
+
+Future automation should select accessibility nodes or stable resource identifiers instead of relying on raw coordinates. It should record display size, application bounds, system-bar insets, orientation, density, and font scale for every run. Screenshots should be associated with the installed package hash and build hash so that visual evidence cannot drift from the tested binary.

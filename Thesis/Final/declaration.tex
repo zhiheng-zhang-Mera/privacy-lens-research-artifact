@@ -1,0 +1,43 @@
+% REDUCED AI use declaration -- lists only the tools whose use falls outside the
+% assessed artefact (Gemini, DeepSeek, Grammarly).
+%
+% This file is NOT compiled into the delivered PDF. main.tex inputs
+% declaration-with-code-assistance.tex, which additionally discloses the code and
+% test assistance item. This reduced version is kept only as a ready revert: see
+% the note in main.tex.
+\chapter*{Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+
+I acknowledge the use of generative artificial intelligence tools in this research
+project. The table below states which tools were used, for what purpose, and how
+their outputs were treated. All AI-assisted material was reviewed, checked against
+primary sources and edited by me; the research design, the implementation as
+described, the evidence reported and the conclusions drawn are my own
+responsibility.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.46\textwidth}}
+\toprule
+Tool & Purpose of use & How the output was treated \\
+\midrule
+Gemini & Discussion of the research proposal; locating the specific provisions of the GDPR relevant to the design & Used to orient the literature and to find candidate provisions. Every provision was then read in the official EUR-Lex text and cited from that source; no legal conclusion in this thesis rests on an AI summary. \\
+DeepSeek & Repository and file operations; natural-language assistance with version control & Used as a tooling assistant for staging, committing and recording changes. It did not author research content; every change was reviewed before it was recorded. \\
+Grammarly & Language checking of the written thesis & Used for grammar, spelling and punctuation only. Suggested edits were accepted or rejected at my discretion, with no change to technical claims, numbers or citations. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Records of the interactions described above are retained in the respective tool
+accounts and can be made available to the subject coordinator on request.
+
+\vspace{1em}
+\noindent Zhiheng Zhang \\
+% The student identifier is personal data: it is printed only by the submission
+% edition. The default build (the one that may be shared or committed) shows the
+% name alone, so no identifier can leak through this page.
+\ifsubmissionedition Student ID: \PrivacyLensStudentID \\ \fi
+% Literal date, not \today, so rebuilds produce an identical PDF digest.
+Date: 16 October 2026
