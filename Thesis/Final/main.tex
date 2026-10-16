@@ -35,6 +35,14 @@
 \newcommand{\RepoBlob}[1]{\href{\RepoURL/blob/\RepoCommit/#1}{\texttt{\seqsplit{#1}}}}
 \newcommand{\RepoCommitLink}[2]{\href{\RepoURL/commit/#1}{\texttt{#2}}}
 \title{Privacy Lens: Evidence-Bounded Android Privacy Review with Regulation-Driven Temporal Combination Notices}
+% The metadata macros are defined in every build so that the declaration always
+% compiles; they are PRINTED only by the submission edition. The default build --
+% the one that may be shared, archived or committed -- carries no student
+% identifier and no supervisor line.
+\IfFileExists{private-submission-metadata.tex}{\input{private-submission-metadata}}{%
+  \newcommand{\PrivacyLensStudentID}{NOT PROVIDED}%
+  \newcommand{\PrivacyLensSupervisor}{NOT PROVIDED}%
+}
 \newif\ifsubmissionedition
 \ifdefined\PrivacyLensSubmissionEdition
   \submissioneditiontrue
@@ -42,10 +50,6 @@
   \submissioneditionfalse
 \fi
 \ifsubmissionedition
-  \IfFileExists{private-submission-metadata.tex}{\input{private-submission-metadata}}{%
-    \newcommand{\PrivacyLensStudentID}{NOT PROVIDED}%
-    \newcommand{\PrivacyLensSupervisor}{NOT PROVIDED}%
-  }
   \author{Zhiheng Zhang \\ Student ID: \PrivacyLensStudentID \\ Supervisor: \PrivacyLensSupervisor}
 \else
   \author{Zhiheng Zhang}
@@ -86,6 +90,15 @@ The strongest external engineering evidence comprises a hash-pinned open-source 
 % Appendix A carries the operational, configuration and reproduction detail that
 % the course word limit excludes from the counted body; Appendix B is the claim
 % and evidence ledger, which is likewise excluded from that limit.
+% The University requires the AI declaration after the reference list and before
+% the appendices, which is this position.
+%
+% This inputs the COMPLETE declaration, which discloses the code and test
+% assistance item as well as the writing and tooling assistance. The reduced
+% three-tool variant is kept as declaration.tex; switch back by changing the
+% \input below to \input{declaration}.
+\clearpage
+\input{declaration-with-code-assistance}
 \clearpage
 \input{appendix-a}
 \clearpage

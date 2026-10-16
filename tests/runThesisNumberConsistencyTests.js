@@ -26,7 +26,10 @@ const fail = (message) => {
   throw new Error(message);
 };
 
-const FINAL_CHAPTERS = ['chapter-01', 'chapter-02', 'chapter-03', 'chapter-04', 'chapter-05', 'chapter-06', 'chapter-07', 'main'];
+// The appendices are part of the scanned set because the body now refers to
+// labels that the appendices define (\ref{app:ops}, \ref{app:claims}); leaving
+// them out made the \ref/\label cross-check report false missing labels.
+const FINAL_CHAPTERS = ['chapter-01', 'chapter-02', 'chapter-03', 'chapter-04', 'chapter-05', 'chapter-06', 'chapter-07', 'appendix-a', 'appendix-b', 'main'];
 const thesis = Object.fromEntries(FINAL_CHAPTERS.map((name) => [name, read(`Thesis/Final/${name}.tex`)]));
 const thesisAll = Object.values(thesis).join('\n');
 
