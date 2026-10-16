@@ -1,6 +1,6 @@
-\subsection{Typed Formal Evidence Model}
+\section{Typed Formal Evidence Model}
 
-The formal model uses typed evidence domains rather than claiming a complete legal lattice. Let $E_{tech}$ contain admitted technical predicates, $E_{context}$ contextual and organisational predicates, $E_{source}$ provenance metadata, $E_{time}$ bounded temporal metadata, and $E_{policy}$ the versioned rule and pack identity. These domains map directly to the predicate unions, evidence-source fields, temporal observations, ledger records, and regulation-owned constraints implemented in \texttt{src/regulations}.
+The formal model uses typed evidence domains rather than claiming a complete legal lattice. Let $E_{tech}$ contain admitted technical predicates, $E_{context}$ contextual and organisational predicates, $E_{source}$ provenance metadata, $E_{time}$ bounded temporal metadata, and $E_{policy}$ the versioned rule and pack identity. These domains map directly to the predicate unions, evidence-source fields, temporal observations, ledger records, and regulation-owned constraints implemented in \RepoTree{src/regulations}.
 
 A compiled rule is $R=(A,C,O)$, where $A$ is a finite set of technical antecedents, $C$ a finite set of required contextual predicates, and $O$ the permitted output \texttt{REVIEW\_REQUIRED}. When $A\subseteq E_{tech}$, the evaluator may emit that review output and records $C\setminus E_{context}$ as missing evidence. The output type contains neither \texttt{LEGAL\_VIOLATION} nor \texttt{LEGAL\_COMPLIANCE}. A non-match emits no assessment and therefore cannot become a compliance finding. Even when the represented contextual predicates are present, the software lacks adjudicative authority and does not model every legally relevant fact.
 

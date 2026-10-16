@@ -1,0 +1,69 @@
+\chapter{Claim and Evidence Ledger}
+\label{app:claims}
+
+This appendix records, for each core claim the thesis makes, what kind of claim it
+is, what evidence supports it, what the evidence does not establish, and where the
+main text states it. It adds no new claim: every row is derived from material
+already present in the body, and the ledger is included here because appendices are
+not counted against the length limit.
+
+The evidence identifiers refer to the evidence objects of
+Table~\ref{tab:evidence-objects}. Tables~\ref{tab:claim-ledger} and
+\ref{tab:claim-ledger-b} list the ledger in two parts. The type column distinguishes a design
+commitment, a model-level argument, a conformance test (expected values derived
+from the same specification the engine implements), an executed test or campaign,
+a source-level statement about the implementation, a recorded receipt, and a
+retrospective analysis of existing records.
+
+\begin{table}[H]
+\centering
+\caption{Claim and evidence ledger, part 1: contracts, admission and temporal behaviour}
+\label{tab:claim-ledger}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.035\textwidth}>{\raggedright\arraybackslash}p{0.255\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}}
+\toprule
+ID & Claim & Type & Evidence & Does not establish & Where \\
+\midrule
+CL-01 & Provenance, temporal scope, pack identity and missing context are carried from admission to presentation & Design + witness & Admission and type model; finding and presentation contracts & That a rendered caveat is understood & Ch.~4, Table~\ref{tab:implementation-witnesses} \\
+CL-02 & The permitted output domain contains no legal-verdict constructor & Model & Typed evidence model; governance tests & That no free-text or human reading reintroduces a verdict & Ch.~3, formal model \\
+CL-03 & Malformed, unsafe or forged-provenance evidence is rejected rather than normalised & Executed test & Adversarial and type-confusion suites & Complete security against a modified binary & Ch.~5, adversarial results \\
+CL-04 & The engine agrees with its specified oracle on all seeded cases, $(TP,TN,FP,FN)=(800,200,0,0)$ & Conformance & 1{,}000 seeded cases (same specification) & Real-world detection accuracy & Ch.~5, deterministic corpus \\
+CL-05 & An identical window does not accumulate on replay & Executed test & Replay fixtures & That overlap in general is excluded & Ch.~5, temporal results \\
+CL-06 & A stored window is admitted only when it ends no later than the candidate window's start; two mutually overlapping stored windows can both contribute & Source-level + counterexample & Engine comparison; worked counterexample; no fixture covers it & That retained history is mutually disjoint & Ch.~3, temporal isolation \\
+CL-07 & The retention watermark is non-decreasing within a process & Source-level invariant & Local watermark over in-memory history & Persistence across process death; no test asserts it & Ch.~3, Ch.~7 \\
+CL-08 & Ledger export is bounded per package but not across packages & Source-level & Export path & A globally capped snapshot & Ch.~3, state-object table \\
+CL-09 & Restore rejects the whole snapshot on any field violation, with no per-entry trimming & Source + test & Restore path; negative restore tests & That the condition is the only reasonable design & Ch.~3, restart contracts \\
+CL-10 & Clearing findings removes persisted findings and the ledger key but does not reset the running engine & Source + test & Clear action; release-privacy contract & That in-memory state is erased & Ch.~3, state objects \\
+CL-11 & 720 permutations of a six-event fixture are order-independent under the stated retention model & Executed test & Permutation fixture & Global order independence for all truncation policies & Ch.~5, temporal correctness \\
+CL-12 & 10{,}000 restart cases restore to a receipt equal to uninterrupted evaluation & Executed campaign & Stress campaign, restart partition & Recovery from a corrupted store & Ch.~5, stress campaign \\
+CL-13 & 40{,}000 / 20{,}000 generated corpora complete 112{,}236 assertions with 22{,}246 rule matches over the registered temporal rules & Executed campaign & Stress receipts with per-rule breakdown & Independent samples, per-case records, a detection rate & Ch.~5, stress campaign \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Claim and evidence ledger, part 2: evaluation, receipts and limits}
+\label{tab:claim-ledger-b}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.035\textwidth}>{\raggedright\arraybackslash}p{0.255\textwidth}>{\raggedright\arraybackslash}p{0.115\textwidth}>{\raggedright\arraybackslash}p{0.19\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.09\textwidth}}
+\toprule
+ID & Claim & Type & Evidence & Does not establish & Where \\
+\midrule
+CL-14 & Nine registered non-equivalent weakenings were each reported detected; eight through the compiled suite, one through a separate script & Curated mutation & Mutation registry; per-mutant receipt recording exit codes & A complete mutation score; that the intended assertion failed, rather than the run & Ch.~5, formal properties \\
+CL-15 & Nine registered safety properties have executable witnesses in committed suites; the registry check binds evidence tokens statically & Executed tests + static binding & Property catalogue; committed suites & That the registry check executes an assertion & Ch.~5, formal properties \\
+CL-16 & The same admitted evidence yields different thresholds and regulation identifiers under two registered packs & Executed test & Pack-switch fixtures & Legal correctness of either mapping & Ch.~5, regulation-pack results \\
+CL-17 & The evaluated package requests no sensitive runtime permission and declares neither Internet nor network-state access & Receipt & Merged manifest; installed-package dump & Absence of every security or dependency risk & Ch.~4, Ch.~5 \\
+CL-18 & \DevicePackagesN{} package identities produced \CompletedWorkflowsN{} completed and \FailedDeviceWorkflowsN{} retained failures (26 / 2 / 1 / 1) & Receipt & Device workflow receipts & Product reliability or a population rate & Ch.~5, device denominators \\
+CL-19 & PSS was recorded for \PssObservedN{} of \CompletedWorkflowsN{} completed workflows and timing for \TimingObservedN{}; the remainder stay missing & Receipt + retrospective analysis & Device measurement records & A missingness mechanism or an unbiased subset & Ch.~5, measurement availability \\
+CL-20 & The static census covers \FDroidCensusN{} APKs with \FDroidSensitiveN{} sensitive-permission, \FDroidSensitiveNetworkN{} sensitive-plus-network and \FDroidMultiProcessN{} multi-process features & Receipt & Hash-pinned census & Runtime flows, lawful basis, commercial-store representativeness & Ch.~5, open-source corpus \\
+CL-21 & One FlowDroid invocation produced \FlowDroidReceiptsN{} receipt and \FlowDroidXmlArtifactsN{} XML artifacts, retained as missing evidence & Receipt & Frozen tool evidence set & Any comparison of detection quality & Ch.~5, static-analysis baseline \\
+CL-22 & The 13-item mapping-review packet is prepared and machine-checked, with no reviewer response & \texttt{NOT\_RUN} & Packet and schema & Legal approval or reviewer agreement & Ch.~2, Ch.~5 \\
+CL-23 & The product-screening assessment is internal, single-evaluator and undated & Internal assessment & Project checklist and walkthrough record & Independent expert review or user preference & Ch.~5, usability assessment \\
+CL-24 & No notification channel exists; the change classification is stored but unconsumed & Source-level & Repository logic; absence of a notification module & Any notification or fatigue outcome & Ch.~3, Ch.~4 \\
+CL-25 & Physical evidence covers one OPPO PERM00 build over one interaction interval & Receipt & Device receipts and screenshots & Cross-OEM behaviour or long-run stability & Ch.~5, Ch.~6 \\
+\bottomrule
+\end{tabular}
+\end{table}

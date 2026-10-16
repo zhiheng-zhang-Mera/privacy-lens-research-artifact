@@ -3,10 +3,10 @@
   "generatedBy": "scripts/write-submission-manifest.js --write",
   "thesis": {
     "pdfFile": "output/pdf/Privacy-Lens-Thesis-Final.pdf",
-    "pdfSha256": "8aeb170c69e4530cde08b26e400a52b34dfdf3e2f5d45fd4c31677c20a4be89b",
-    "pdfBytes": 579738,
-    "pdfPages": 85,
-    "pdfCreatedAt": "2026-09-01T07:00:00",
+    "pdfSha256": "7701464673bfe767c915fedb002d4fe7bea3037e568e03ba417fd0bedf07919b",
+    "pdfBytes": 692247,
+    "pdfPages": 105,
+    "pdfCreatedAt": "2026-10-16T00:00:00",
     "sourceDirectory": "Thesis/Final",
     "inputFile": "Thesis/Final/main.tex",
     "buildProcedure": [

@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[11pt,a4paper]{report}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{geometry}
@@ -27,6 +27,13 @@
 \setlength{\parskip}{0.15em}
 \setlength{\emergencystretch}{2em}
 \hypersetup{pdftitle={Privacy Lens: Regulation-Driven Temporal Privacy Review},pdfauthor={Zhiheng Zhang}}
+% Record pointers resolve to the pinned public artifact revision, so every
+% location the thesis directs a reader to can be opened and checked directly.
+\newcommand{\RepoURL}{https://github.com/zhiheng-zhang-Mera/privacy-lens-research-artifact}
+\newcommand{\RepoCommit}{fe4b11bc5337d37a0e8b50856ab338001123d5c4}
+\newcommand{\RepoTree}[1]{\href{\RepoURL/tree/\RepoCommit/#1}{\texttt{\seqsplit{#1}}}}
+\newcommand{\RepoBlob}[1]{\href{\RepoURL/blob/\RepoCommit/#1}{\texttt{\seqsplit{#1}}}}
+\newcommand{\RepoCommitLink}[2]{\href{\RepoURL/commit/#1}{\texttt{#2}}}
 \title{Privacy Lens: Evidence-Bounded Android Privacy Review with Regulation-Driven Temporal Combination Notices}
 \newif\ifsubmissionedition
 \ifdefined\PrivacyLensSubmissionEdition
@@ -51,9 +58,9 @@
 \small\singlespacing
 Privacy Lens is a local-first Android research prototype that transforms heterogeneous, bounded privacy evidence into review prompts without treating a technical signal as proof of purpose, necessity, lawful basis, compliance, or intent. Its fail-closed pipeline preserves provenance, temporal scope, regulation-pack identity, missing context, and unavailable outputs through admission, temporal combination, typed policy interpretation, persistence, and presentation.
 
-The contribution is an evidence-bounded architecture and evaluation method connecting executable safety properties to explicit claim limits. Versioned packs own jurisdiction-dependent mappings; a typed graph and policy output space permit review obligations but exclude legal verdicts. Deterministic, adversarial, restart, and curated mutation suites evaluate semantic conformance, while a FlowDroid adapter evaluates provenance-preserving interoperability rather than detector superiority.
+The thesis reports three contributions. The first is a set of cross-layer evidence-bounded contracts: source, missing context, pack identity, and permitted output are carried as one inspectable interface and state contract from admission to presentation, and the permitted output domain excludes legal verdicts. The second is bounded temporal combination and state-continuity semantics: replay, overlap, source and pack isolation, order, and recovery receive explicit conditions, and the losses that remain are stated rather than hidden. The third is a layered, diagnostic evaluation that reports unlike evidence objects with separate denominators, retains failures and missing values, names the oracle tier of each suite, and draws a transferable finding from what the existing records do and do not show.
 
-The strongest external engineering evidence comprises a hash-pinned open-source census of \FDroidCensusN{} APKs, bounded physical-device workflows for \DevicePackagesN{} package identities with \CompletedWorkflowsN{} completed and \FailedDeviceWorkflowsN{} retained failures, and a one-device interface record for release \PrivacyLensVersion{}. Missing static-analysis artifacts remain missing evidence and corpus-derived counts are not converted into legal labels. These results support reproducible engineering claims only: independent legal mapping review, participant comprehension, multi-OEM replication, population accuracy, production signing, and store acceptance remain unestablished.
+The strongest external engineering evidence comprises a hash-pinned open-source census of \FDroidCensusN{} APKs, bounded physical-device workflows for \DevicePackagesN{} package identities with \CompletedWorkflowsN{} completed and \FailedDeviceWorkflowsN{} retained failures, and a one-device interface record for release \PrivacyLensVersion{}. Missing static-analysis artifacts remain missing evidence, corpus-derived counts are not converted into legal labels, and counts drawn from different evidence objects are never summed. These results support reproducible engineering claims only: independent legal mapping review, participant comprehension, multi-OEM replication, population accuracy, production signing, and store acceptance remain unestablished.
 \end{abstract}
 \newpage
 \tableofcontents
@@ -65,8 +72,22 @@ The strongest external engineering evidence comprises a hash-pinned open-source 
 \input{chapter-05}
 \input{chapter-06}
 \input{chapter-07}
+% The reference list must start on a fresh page (course requirement). \clearpage
+% also flushes any pending figures or tables so the list is not interleaved.
+\clearpage
+\phantomsection
+% report/book classes name the reference list with \bibname, not \refname
+\renewcommand{\bibname}{References}
+\addcontentsline{toc}{chapter}{\bibname}
 {\small
 \bibliographystyle{ieeetr}
 \bibliography{reference}
 }
+% Appendix A carries the operational, configuration and reproduction detail that
+% the course word limit excludes from the counted body; Appendix B is the claim
+% and evidence ledger, which is likewise excluded from that limit.
+\clearpage
+\input{appendix-a}
+\clearpage
+\input{appendix-b}
 \end{document}
